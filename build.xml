@@ -5,7 +5,7 @@
 	<property file="build.properties"/>
 	<path id="junit.classpath">
 		<fileset dir="${lib.dir}">
-			<include name="${lib.dir}/**/*.jar"/>
+			<include name="*.jar"/>
 		</fileset>
 	</path>
 	
@@ -35,7 +35,7 @@
 			<classpath location="${classes.dir}"/>
 			<classpath refid="junit.classpath"/>
 			<formatter type="brief" usefile="false"/>
-			<test name="testSuite"/>
+			<!--<test name="testSuite"/>-->
 			<formatter type="xml"/>
 			<batchtest fork="yes" todir="${reports.xml.dir}">
 				<fileset dir="${test.dir}">
@@ -43,12 +43,12 @@
 				</fileset>
 			</batchtest>
 		</junit>
-		<junitreport>
+		<!--<junitreport>
 			<fileset dir="${reports.xml.dir}">
 				<include name="TEST*.xml"/>
 			</fileset>
 			<report format="frames" todir="${reports.html.dir}"/>
-		</junitreport>
+		</junitreport>-->
 	</target>
 
 </project>
