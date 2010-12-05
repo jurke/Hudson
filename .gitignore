@@ -1,4 +1,4 @@
 bin
-reports
-classes
-*.xml
+reports/**
+classes/**
+

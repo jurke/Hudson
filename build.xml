@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 	
-<project name="Hudson" basedir=".">
-	<description>Beispiel eines Ant-Buils</description>
+<project name="HudsonStatusLog" default="test" basedir=".">
+	<description>Ant-Build</description>
 	<property file="build.properties"/>
 	<path id="junit.classpath">
 		<fileset dir="${lib.dir}">
-			<include name="**/*.jar"/>
+			<include name="${lib.dir}/**/*.jar"/>
 		</fileset>
 	</path>
+	
 	<target name="init" depends="clean" description="Prepare needed directories">
 		<mkdir dir="${classes.dir}"/>
 		<mkdir dir="${reports.xml.dir}"/>
