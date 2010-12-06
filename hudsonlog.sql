@@ -1,4 +1,5 @@
 DROP DATABASE IF EXISTS hudson;
+
 CREATE DATABASE hudson;
 USE hudson;
 CREATE TABLE `t_buildinfo` (
@@ -30,4 +31,10 @@ ALTER TABLE `t_buildlog`  ADD CONSTRAINT `FK_t_buildlog_t_buildinfo` FOREIGN KEY
 
 INSERT INTO `t_messages` (`ID`,`Message`) VALUES ('0', '');
 
-
+DELIMITER //
+CREATE FUNCTION `pr_ExistTable`(`TableName` vARCHAR(255)) RETURNS tinyint(1)
+    COMMENT 'Bestimmt die Existenz einer Tabelle mittels Tabellenname'
+BEGIN
+RETURN (SELECT COUNT(*)=1 AS Exist FROM `information_schema`.`TABLES` WHERE `information_schema`.`TABLES`.TABLE_SCHEMA=DATABASE() AND `information_schema`.`TABLES`.TABLE_NAME=TableName);
+END//
+DELIMITER ;
