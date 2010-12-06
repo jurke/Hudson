@@ -22,4 +22,25 @@ public class FieldDef {
 	public void setFieldValue(ArrayList<Object> fieldValue) {
 		this.fieldValue = fieldValue;
 	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		boolean ret=false;
+		if (obj instanceof FieldDef){
+			ret=this.hashCode()==((FieldDef) obj).hashCode();
+		}
+		return ret;
+	}
+	
+	
+	@Override
+	public int hashCode() {
+		int result = 17,x=0;
+		for(x=0;x<fieldValue.size();x++){
+			result = 31 * result + fieldValue.get(x).hashCode();
+		}
+		result = 31 * result + fieldName.hashCode();
+		return result;
+	}
+	
 }
