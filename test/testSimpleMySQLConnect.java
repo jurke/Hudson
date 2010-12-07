@@ -17,6 +17,25 @@ public class testSimpleMySQLConnect {
 	}
 	@Test
 	public void testConnect() throws InstantiationException, IllegalAccessException, ClassNotFoundException {
-		assertTrue((cut.Connect("localhost", "mysql", "root", "")!=null));
+		assertTrue(cut.Connect("localhost", "mysql", "root", ""));
 	}
+	@Test
+	public void testExistTable() throws InstantiationException, IllegalAccessException, ClassNotFoundException{
+		SimpleMySQLConnect s=new SimpleMySQLConnect();
+
+		try {
+			s.Connect("localhost", "hudson","root","");
+			assertTrue(s.existTable("t_buildinfo"));
+		} catch (InstantiationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
 }
