@@ -37,5 +37,31 @@ public class testSimpleMySQLConnect {
 			e.printStackTrace();
 		}
 	}
-	
+	@Test
+	public void testRead(){
+		SimpleMySQLConnect s=new SimpleMySQLConnect();
+		SQLTable tbl=null;
+		try {
+			s.Connect("localhost", "hudson","root","");
+		} catch (InstantiationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		tbl=s.Read("SELECT * FROM t_messages;");
+		if(tbl!=null){
+			System.out.println(tbl.getTableName());
+			for(int x=0;x<tbl.getFields().size();x++){
+				System.out.println("Fld:"+tbl.getFields().get(x).getFieldName());
+				for(int y=0;y<tbl.getFields().get(x).getFieldValue().size();y++){
+					System.out.println(tbl.getFields().get(x).getFieldValue().get(y).toString());
+				}
+			}
+		} 
+	}
 }

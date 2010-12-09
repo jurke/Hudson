@@ -1,9 +1,12 @@
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.HashMap;
+
 
 public class SimpleMySQLConnect {
 	private static boolean driverExist=false;
@@ -74,47 +77,40 @@ public class SimpleMySQLConnect {
 	}
 	
 	
-	public SQLTable Read(String tableName,ArrayList<WhereDef> whereDef){
+	public SQLTable Read(String sql){
 		SQLTable ret=null;
-		String sql=null,wsql=null;
 		Statement stmt = null;
 		ResultSet rs = null;
+		ResultSetMetaData rsm=null;
+		ArrayList<FieldDef> field=new ArrayList<FieldDef>();
+		HashMap<String,FieldDef> h=new HashMap<String,FieldDef>();
+		FieldDef tmp=null;
 		int x=0;
-		if((tableName!=null)&&(conn!=null)&&existTable(tableName)){
-			sql="SELECT * FROM "+tableName;
-			if(whereDef!=null && whereDef.size()>0){
-				wsql="WHERE ";
-				for(x=0;x<whereDef.size();x++){
-					if(wsql!=null){
-						wsql=wsql+whereDef.get(x).getWhereCondition()+" ";
-						if(x<whereDef.size()-1 && whereDef.get(x).getWhereLink()!=null){
-							wsql=wsql+whereDef.get(x).getWhereLink();
-						}else{
-							wsql=null;
-						}
-					}
+		if((sql!=null)&&(conn!=null)){
+			try {
+				stmt = conn.createStatement();
+				System.out.println(sql);
+				rs = stmt.executeQuery(sql);
+				rsm=rs.getMetaData();
+				for(x=1;x<=rsm.getColumnCount();x++){
+					tmp=new FieldDef(rsm.getColumnName(x),new ArrayList<Object>());
+					h.put(rsm.getColumnClassName(x),tmp);
+					field.add(tmp);
 				}
-				if(wsql==null) {wsql="";}
-				sql=sql+wsql+";";
-
-				try {
-					stmt = conn.createStatement();
-					rs = stmt.executeQuery(sql);
-					rs.close();
-					stmt.close();
-					ret=new SQLTable(tableName,null);
-				} catch (SQLException e) {
-					// TODO Auto-generated catch block
-					ret=null;
+				while(rs.next()){
+					for(x=1;x<=rsm.getColumnCount();x++){
+						tmp=h.get(rsm.getColumnClassName(x));
+						tmp.getFieldValue().add(rs.getObject(x));
+					}	
 				}
+				ret=new SQLTable("SQL_"+sql.hashCode(),field);
+			} catch (SQLException e) {
+				ret=null;
 			}
 		}
+		h.clear();
+		h=null;
 		return ret;
-	}
-	
-	public SQLTable Read(String sql){
-		
-		return null;
 	}
 	
 	
