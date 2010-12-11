@@ -75,16 +75,13 @@ public class SimpleMySQLConnect {
 		}
 		return ret;
 	}
-	
-	public void Write(SQLTable tbl,ArrayList<String> ignoreFields){
-		String sql=null,insertTblFields=null,insertValues=null,tmpVal=null,tmpFld=null;
-		boolean ignoreField =false;
-		ArrayList<String> isql=new ArrayList<String>();
-		Statement stmt = null;
-		ResultSet rs = null;
+	public ArrayList<SQLData> writeSQLGen(SQLTable tbl,ArrayList<String> ignoreFields){
+		ArrayList<SQLData> ret=new ArrayList<SQLData>();
+		String tmp=null,sql=null,insertTblFields=null,insertValues=null,tmpVal=null,tmpFld=null;
+		boolean ignoreField=false;
 		int x=0,y=0,c=0;
-		sql = "SELECT * FROM "+tbl.getTableName() + " WHERE ";
-		for(y=0;y<tbl.getFields().get(x).getFieldValue().size();y++){
+		for(y=0;y<tbl.getFields().get(0).getFieldValue().size();y++){
+			sql = "SELECT * FROM "+tbl.getTableName() + " WHERE ";
 			insertTblFields="";insertValues="";
 			for(x=0;x<tbl.getFields().size();x++){
 				ignoreField=(ignoreFields!=null)&&ignoreFields.contains(tbl.getFields().get(x).getFieldName());
@@ -99,33 +96,32 @@ public class SimpleMySQLConnect {
 				}
 			}
 			if(c>0){
-				sql=sql.substring(0,sql.length()-5)+";";
-				System.out.println(sql);
-				if((conn!=null)){
-					try {
-						stmt = conn.createStatement();
-						rs = stmt.executeQuery(sql);
-						rs.last();
-						if(rs.getRow()==0){
-							insertValues=insertValues.substring(0,insertValues.length()-2);
-							insertTblFields=insertTblFields.substring(0,insertTblFields.length()-2);
-							sql="INSERT INTO "+tbl.getTableName()+"("+insertTblFields+") VALUES ("+insertValues+");";
-							isql.add(sql);
-						}
-						rs.close();
-						stmt.close();
-					} catch (SQLException e) {
-						e.printStackTrace();
-					}
+				if(ignoreFields!=null && ignoreFields.size()>0) tmp="INSERT"; else tmp="REPLACE";
+				ret.add(new SQLData(sql.substring(0,sql.length()-5)+";",tmp+" INTO "+tbl.getTableName()+" ("+insertTblFields.substring(0,insertTblFields.length()-2)+") VALUES "+" ("+insertValues.substring(0,insertValues.length()-1)+");"));
+			}
+		}
+		return ret;
+	}
+	
+	public void write(SQLTable tbl,ArrayList<String> ignoreFields){	
+		Statement stmt = null;
+		ArrayList<SQLData> sqlData=null;
+		int x=0;
+		sqlData=writeSQLGen(tbl,ignoreFields);
+		if((conn!=null)&&sqlData!=null){
+			for(x=0;x<sqlData.size()-1;x++){
+				try {
+					stmt = conn.createStatement();
+					stmt.execute(sqlData.get(x).getInsertReplaceSQL());
+					stmt.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
 				}
 			}
 		}
-		for(x=0;x<isql.size();x++){
-			System.out.println(isql.get(x));
-		}
-		rs=null;
 		stmt=null;
 	}
+	
 	public SQLTable Read(String sql){
 		SQLTable ret=null;
 		Statement stmt = null;
