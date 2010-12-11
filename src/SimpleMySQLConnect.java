@@ -75,7 +75,7 @@ public class SimpleMySQLConnect {
 		}
 		return ret;
 	}
-	public ArrayList<SQLData> writeSQLGen(SQLTable tbl,ArrayList<String> ignoreFields){
+	private ArrayList<SQLData> writeSQLGen(SQLTable tbl,ArrayList<String> ignoreFields){
 		ArrayList<SQLData> ret=new ArrayList<SQLData>();
 		String tmp=null,sql=null,insertTblFields=null,insertValues=null,tmpVal=null,tmpFld=null;
 		boolean ignoreField=false;
