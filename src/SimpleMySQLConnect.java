@@ -76,7 +76,56 @@ public class SimpleMySQLConnect {
 		return ret;
 	}
 	
-	
+	public void Write(SQLTable tbl,ArrayList<String> ignoreFields){
+		String sql=null,insertTblFields=null,insertValues=null,tmpVal=null,tmpFld=null;
+		boolean ignoreField =false;
+		ArrayList<String> isql=new ArrayList<String>();
+		Statement stmt = null;
+		ResultSet rs = null;
+		int x=0,y=0,c=0;
+		sql = "SELECT * FROM "+tbl.getTableName() + " WHERE ";
+		for(y=0;y<tbl.getFields().get(x).getFieldValue().size();y++){
+			insertTblFields="";insertValues="";
+			for(x=0;x<tbl.getFields().size();x++){
+				ignoreField=(ignoreFields!=null)&&ignoreFields.contains(tbl.getFields().get(x).getFieldName());
+				if(!ignoreField)
+				{
+					tmpVal="'"+tbl.getFields().get(x).getFieldValue().get(y)+"'";
+					tmpFld=tbl.getFields().get(x).getFieldName();
+					sql=sql+tbl.getTableName()+"."+tmpFld+"="+tmpVal+" AND ";
+					c++;
+					insertTblFields=insertTblFields.concat("`"+tmpFld+"`,");
+					insertValues=insertValues.concat(tmpVal+",");
+				}
+			}
+			if(c>0){
+				sql=sql.substring(0,sql.length()-5)+";";
+				System.out.println(sql);
+				if((conn!=null)){
+					try {
+						stmt = conn.createStatement();
+						rs = stmt.executeQuery(sql);
+						rs.last();
+						if(rs.getRow()==0){
+							insertValues=insertValues.substring(0,insertValues.length()-2);
+							insertTblFields=insertTblFields.substring(0,insertTblFields.length()-2);
+							sql="INSERT INTO "+tbl.getTableName()+"("+insertTblFields+") VALUES ("+insertValues+");";
+							isql.add(sql);
+						}
+						rs.close();
+						stmt.close();
+					} catch (SQLException e) {
+						e.printStackTrace();
+					}
+				}
+			}
+		}
+		for(x=0;x<isql.size();x++){
+			System.out.println(isql.get(x));
+		}
+		rs=null;
+		stmt=null;
+	}
 	public SQLTable Read(String sql){
 		SQLTable ret=null;
 		Statement stmt = null;
@@ -89,7 +138,6 @@ public class SimpleMySQLConnect {
 		if((sql!=null)&&(conn!=null)){
 			try {
 				stmt = conn.createStatement();
-				System.out.println(sql);
 				rs = stmt.executeQuery(sql);
 				rsm=rs.getMetaData();
 				for(x=1;x<=rsm.getColumnCount();x++){
@@ -103,13 +151,19 @@ public class SimpleMySQLConnect {
 						tmp.getFieldValue().add(rs.getObject(x));
 					}	
 				}
+				rs.close();
+				stmt.close();
 				ret=new SQLTable("SQL_"+sql.hashCode(),field);
 			} catch (SQLException e) {
+				
 				ret=null;
 			}
 		}
 		h.clear();
 		h=null;
+		rsm=null;
+		rs=null;
+		stmt=null;
 		return ret;
 	}
 	
